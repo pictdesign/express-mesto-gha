@@ -1,0 +1,34 @@
+{
+  "name": "express-mesto-gha",
+  "version": "1.0.0",
+  "description": "сервер для проекта Mesto",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pictdesign/express-mesto-gha.git"
+  },
+  "author": "Pict",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pictdesign/express-mesto-gha/issues"
+  },
+  "homepage": "https://github.com/pictdesign/express-mesto-gha#readme",
+  "devDependencies": {
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-react": "^7.29.4",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "express": "^4.17.3",
+    "mongoose": "^6.2.9"
+  }
+}
