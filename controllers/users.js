@@ -4,7 +4,7 @@ const User = require("../models/user");
 const getUsers = (req, res) => {
   return User.find({})
     .then((users) => res.status(200).send(users))
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(500).send({ message: 'Произошла ошибка', err }));
 };
 
 const getUser = (req, res) => {
@@ -15,20 +15,20 @@ const getUser = (req, res) => {
       }
       res.status(200).send(user);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(500).send({ message: 'Произошла ошибка', err }));
 };
 
 const createUser = (req, res) => {
   return User.create({
     ...req.body,
   }).then((user) => res.status(201).send({data: user, message: 'Пользователь создан' }))
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(500).send({ message: 'Произошла ошибка', err }));
 };
 
 const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id, req.body, { new: true })
     .then((user) => res.send({ data: user}))
-    .catch((err) => res.status(500).send({ message: 'Произошла ошибка', err }))
+    .catch((err) => res.status(500).send({ message: 'Произошла ошибка', err }));
 };
 
 const updateAvatar = (req, res) => {
