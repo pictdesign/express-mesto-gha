@@ -6,13 +6,23 @@ const cardsRouter = require('./router/cards');
 const mongoose = require('mongoose');
 const bodyParser = require("body-parser");
 
-mongoose.connect("mongodb://localhost:27017/mesto");
+mongoose.connect("mongodb://localhost:27017/mesto", {
+  useNewUrlParser: true,
+});
 
 app.use((req, res, next) => {
   req.user = {
     _id: '624b10e503bbc8c7df02c031'
   };
   next();
+});
+
+app.use('*', (req, res, next) => {
+  try {
+    throw new NotFoundError('Страница не найдена');
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.use(bodyParser.json());
