@@ -21,20 +21,20 @@ const getUser = (req, res) => {
 const createUser = (req, res) => {
   return User.create({
     ...req.body,
-  }).then((user) => res.status(200).send(user))
+  }).then((user) => res.status(201).send({data: user, message: 'Пользователь создан' }))
     .catch((err) => console.log(err));
 };
 
 const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id, req.body, { new: true })
     .then((user) => res.send({ data: user}))
-    .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }))
+    .catch((err) => res.status(500).send({ message: 'Произошла ошибка', err }))
 };
 
 const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, req.body, { new: true })
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => res.status(500).send({ message: 'Произошла ошибка', err }));
 };
 
 module.exports = { getUsers, getUser, createUser, updateUser, updateAvatar };
