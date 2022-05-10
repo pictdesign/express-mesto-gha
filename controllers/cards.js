@@ -11,7 +11,13 @@ const createCard = (req, res) => {
   const owner = req.user._id
   return Card.create({ name, link, owner })
     .then((card) => res.status(201).send({ data: card, message: 'Карточка создана' }))
-    .catch((err) => res.status(500).send({ message: "Произошла ошибка", err}));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: "Некорректные данные" });
+      } else {
+        res.status(500).send({ message: "Произошла ошибка", err });
+      }
+    });
 };
 
 const deleteCard = (req, res) => {

@@ -15,7 +15,7 @@ const getUser = (req, res, next) => {
         res.status(200).send(user);
       }
     })
-    .catch((err) => res.status(500).send({ message: "На сервере произошла ошибка", err }));
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка", err}));
 };
 
 const createUser = (req, res) => {
@@ -26,7 +26,7 @@ const createUser = (req, res) => {
       if (err.name === "ValidationError") {
         res.status(400).send({ message: "Некорректные данные" });
       } else {
-        res.status(500).send({ message: "На сервере произошла ошибка" });
+        res.status(500).send({ message: "Произошла ошибка", err });
       }
     });
 };
@@ -34,13 +34,13 @@ const createUser = (req, res) => {
 const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id, req.body, { new: true })
     .then((user) => res.send({ data: user}))
-    .catch((err) => res.status(500).send({ message: "На сервере произошла ошибка", err }));
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка", err}));
 };
 
 const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, req.body, { new: true })
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: "На сервере произошла ошибка", err }));
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка", err}));
 };
 
 module.exports = { getUsers, getUser, createUser, updateUser, updateAvatar };
