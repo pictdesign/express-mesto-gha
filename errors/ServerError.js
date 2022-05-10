@@ -1,5 +1,9 @@
-const Error = require("../middleware/error");
-
-const ServerError = (err) => Error(500, 'Произошла ошибка', err);
+class ServerError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ServerError';
+    this.statusCode = 500;
+  }
+}
 
 module.exports = { ServerError };

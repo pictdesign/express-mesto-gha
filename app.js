@@ -17,14 +17,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('*', (req, res, next) => {
-  try {
-    throw new NotFoundError('Страница не найдена');
-  } catch (err) {
-    next(err);
-  }
-});
-
 app.use(bodyParser.json());
 app.use(userRouter);
 app.use(cardsRouter);

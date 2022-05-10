@@ -1,5 +1,9 @@
-const Error = require("../middleware/error");
-
-const NotFoundError = (message) => Error(404, message);
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'NotFoundError';
+    this.statusCode = 404;
+  }
+}
 
 module.exports = { NotFoundError };
