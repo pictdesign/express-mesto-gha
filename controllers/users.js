@@ -5,14 +5,14 @@ const { NotFoundError } = require("../errors/NotFoundError");
 const getUsers = (req, res) => {
   return User.find({})
     .then((users) => res.status(200).send(users))
-    .catch((err) => {throw new ServerError(err)});
+    .catch((err) => res.status(500).send({ message: "На сервере произошла ошибка", err }));
 };
 
 const getUser = (req, res) => {
   return User.findOne({ _id: req.params.id })
     .then((user) => {
       if (!user) {
-        res.status(200).send({message: "Пользователь с таким id не найден"});
+        res.status(404).send({message: "Пользователь с таким id не найден"});
       }
       res.status(200).send(user);
     })
@@ -35,13 +35,13 @@ const createUser = (req, res) => {
 const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id, req.body, { new: true })
     .then((user) => res.send({ data: user}))
-    .catch((err) => {throw new ServerError(err)});
+    .catch((err) => res.status(500).send({ message: "На сервере произошла ошибка", err }));
 };
 
 const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, req.body, { new: true })
     .then((user) => res.send({ data: user }))
-    .catch((err) => {throw new ServerError(err)});
+    .catch((err) => res.status(500).send({ message: "На сервере произошла ошибка", err }));
 };
 
 module.exports = { getUsers, getUser, createUser, updateUser, updateAvatar };
