@@ -19,9 +19,10 @@ const deleteCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным id не найдена' });
+      } else {
+        card.remove();
+        res.status(200).send({ data: card, message: 'Карточка удалена' });
       }
-      card.remove();
-      res.status(200).send({ data: card, message: 'Карточка удалена' });
     })
     .catch((err) => res.status(500).send({ message: "Произошла ошибка", err}));
 };
