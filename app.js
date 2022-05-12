@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use(userRouter);
 app.use(cardsRouter);
 app.use('*', (req, res) => {
-  res.status(404).send({message: 'Страница не найдена'});
+  res.status(NotFoundError).send({message: 'Страница не найдена'});
 });
 
 app.listen(PORT, () => {
