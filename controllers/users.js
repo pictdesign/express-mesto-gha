@@ -2,11 +2,11 @@ const User = require("../models/user");
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.status(200).send({ data: users }))
     .catch((err) => res.status(500).send({ message: "На сервере произошла ошибка", err }));
 };
 
-const getUser = (req, res, next) => {
+const getUser = (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((user) => {
       if (!user) {
@@ -31,16 +31,53 @@ const createUser = (req, res) => {
     });
 };
 
-const updateUser = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, { new: true })
-    .then((user) => res.send({ data: user}))
+const getMe = (req, res) => {
+  const userId = req.user._id;
+  User.findById({ _id: userId })
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({message: "Пользователь с таким id не найден"});
+      } else {
+        res.status(200).send(user);
+      }
+    })
     .catch((err) => res.status(500).send({ message: "Произошла ошибка", err}));
 };
 
-const updateAvatar = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, { new: true })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: "Произошла ошибка", err}));
+const updateUser = async (req, res) => {
+  const userId = req.user._id;
+  const { name, about } = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(userId, { name, about }, { new: true });
+    if (!user) {
+      res.status(404).send({ message: "Пользователь не найден"});
+    }
+    res.status(200).send({ user });
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      res.status(400).send({ message: "Некорректные данные" });
+    } else {
+      res.status(500).send({ message: "Произошла ошибка", err });
+    }
+  }
 };
 
-module.exports = { getUsers, getUser, createUser, updateUser, updateAvatar };
+const updateAvatar = async (req, res) => {
+  const userId = req.user._id;
+  const { avatar } = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(userId, { avatar }, { new: true });
+    if (!user) {
+      res.status(404).send({ message: "Пользователь не найден"});
+    }
+    res.status(200).send({ user });
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      res.status(400).send({ message: "Некорректные данные" });
+    } else {
+      res.status(500).send({ message: "Произошла ошибка", err });
+    }
+  }
+};
+
+module.exports = { getUsers, getUser, getMe, createUser, updateUser, updateAvatar };

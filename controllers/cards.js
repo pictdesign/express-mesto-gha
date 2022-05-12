@@ -2,7 +2,7 @@ const Card = require("../models/card");
 
 const getCards = (req, res) => {
   return Card.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch((err) => res.status(500).send({ message: "Произошла ошибка", err}));
 };
 
