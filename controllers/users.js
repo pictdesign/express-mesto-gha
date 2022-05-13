@@ -36,7 +36,7 @@ const updateUser = async (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(userId, { name, about }, { new: true });
+    const user = await User.findByIdAndUpdate(userId, { name: name, about: about }, { new: true, runValidators: true });
     if (!user) {
       throw new NotFoundError('Пользователь не найден');
     }
@@ -54,7 +54,7 @@ const updateAvatar = async (req, res) => {
   const userId = req.user._id;
   const { avatar } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(userId, { avatar }, { new: true });
+    const user = await User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true });
     if (!user) {
       throw new NotFoundError('Пользователь не найден');
     }
