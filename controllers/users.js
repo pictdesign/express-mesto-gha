@@ -1,64 +1,51 @@
 const User = require("../models/user");
-const {ServerError, NotFoundError, BadRequest} = require("../errors/errors");
+const {NotFoundError, BadRequestError} = require("../errors/errors");
 
-const getUsers = (req, res) => {
+const getUsers = (_, res, next) => {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch((err) => res.status(ServerError).send({ message: "На сервере произошла ошибка" }));
+    .catch((err) => next(err));
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.findOne({ _id: req.params.id })
     .then((user) => {
       if (!user) {
-        res.status(NotFoundError).send({message: "Пользователь с таким id не найден"});
+        throw new NotFoundError('Пользователь не найден');
       } else {
         res.status(200).send(user);
       }
     })
-    .catch((err) => res.status(BadRequest).send({ message: "На сервере произошла ошибка" }));
+    .catch((err) => next(err));
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {name, about, avatar} = req.body;
   User.create({name, about, avatar})
     .then((user) => res.status(201).send({data: user, message: 'Пользователь создан' }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(BadRequest).send({ message: "Некорректные данные" });
+        next(new BadRequestError());
       } else {
-        res.status(BadRequest).send({ message: "На сервере произошла ошибка" });
+        next(err);
       }
     });
 };
 
-const getMe = (req, res) => {
-  const userId = req.user._id;
-  User.findById({ _id: userId })
-    .then((user) => {
-      if (!user) {
-        res.status(BadRequest).send({message: "Пользователь с таким id не найден"});
-      } else {
-        res.status(200).send(user);
-      }
-    })
-    .catch((err) => res.status(BadRequest).send({ message: "На сервере произошла ошибка" }));
-};
-
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
   try {
     const user = await User.findByIdAndUpdate(userId, { name, about }, { new: true });
     if (!user) {
-      res.status(NotFoundError).send({ message: "Пользователь не найден"});
+      throw new NotFoundError('Пользователь не найден');
     }
     res.status(200).send({ user });
   } catch (err) {
     if (err.name === "ValidationError") {
-      res.status(BadRequest).send({ message: "Некорректные данные" });
+      next(new BadRequestError());
     } else {
-      res.status(BadRequest).send({ message: "На сервере произошла ошибка" });
+      next(err);
     }
   }
 };
@@ -69,16 +56,16 @@ const updateAvatar = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(userId, { avatar }, { new: true });
     if (!user) {
-      res.status(NotFoundError).send({ message: "Пользователь не найден"});
+      throw new NotFoundError('Пользователь не найден');
     }
     res.status(200).send({ user });
   } catch (err) {
     if (err.name === "ValidationError") {
-      res.status(BadRequest).send({ message: "Некорректные данные" });
+      next(new BadRequestError());
     } else {
-      res.status(BadRequest).send({ message: "На сервере произошла ошибка" });
+      next(err);
     }
   }
 };
 
-module.exports = { getUsers, getUser, getMe, createUser, updateUser, updateAvatar };
+module.exports = { getUsers, getUser, createUser, updateUser, updateAvatar };
