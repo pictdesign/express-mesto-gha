@@ -32,7 +32,13 @@ const deleteCard = (req, res, next) => {
         res.status(200).send({ data: card, message: 'Карточка удалена' });
       }
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(new BadRequestError('Некорректный id карточки'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const likeCard = (req, res, next) => {
@@ -45,8 +51,8 @@ const likeCard = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new BadRequestError());
+      if (err.name === "CastError") {
+        next(new BadRequestError('Некорректный id карточки'));
       } else {
         next(err);
       }
@@ -63,8 +69,8 @@ const dislikeCard = (req, res, next) => {
     }
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new BadRequestError());
+      if (err.name === "CastError") {
+        next(new BadRequestError('Некорректный id карточки'));
       } else {
         next(err);
       }
