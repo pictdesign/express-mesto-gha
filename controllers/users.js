@@ -8,7 +8,7 @@ const getUsers = (_, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  User.findOne({ _id: req.params.id })
+  User.findById({ _id: req.params.id })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
@@ -16,7 +16,13 @@ const getUser = (req, res, next) => {
         res.status(200).send(user);
       }
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Некорректный id пользователя'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const createUser = (req, res, next) => {
