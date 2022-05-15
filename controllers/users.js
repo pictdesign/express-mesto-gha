@@ -4,7 +4,7 @@ const BadRequestError = require('../errors/BadRequestError');
 
 const getUsers = (_, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send({ data: users }))
+    .then((users) => res.status(200).send({ users }))
     .catch((err) => next(err));
 };
 
@@ -29,7 +29,7 @@ const getUser = (req, res, next) => {
 const createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(201).send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError());
