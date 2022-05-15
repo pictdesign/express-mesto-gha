@@ -1,5 +1,6 @@
-const User = require("../models/user");
-const {NotFoundError, BadRequestError} = require("../errors/errors");
+const User = require('../models/user');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
 
 const getUsers = (_, res, next) => {
   User.find({})
@@ -26,11 +27,11 @@ const getUser = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const {name, about, avatar} = req.body;
-  User.create({name, about, avatar})
-    .then((user) => res.status(201).send({data: user, message: 'Пользователь создан' }))
+  const { name, about, avatar } = req.body;
+  User.create({ name, about, avatar })
+    .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError());
       } else {
         next(err);
@@ -42,13 +43,17 @@ const updateUser = async (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(userId, { name: name, about: about }, { new: true, runValidators: true });
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name, about },
+      { new: true, runValidators: true },
+    );
     if (!user) {
       throw new NotFoundError('Пользователь не найден');
     }
     res.status(200).send({ user });
   } catch (err) {
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       next(new BadRequestError());
     } else {
       next(err);
@@ -56,17 +61,21 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-const updateAvatar = async (req, res) => {
+const updateAvatar = async (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true });
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { avatar },
+      { new: true, runValidators: true },
+    );
     if (!user) {
       throw new NotFoundError('Пользователь не найден');
     }
     res.status(200).send({ user });
   } catch (err) {
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       next(new BadRequestError());
     } else {
       next(err);
@@ -74,4 +83,10 @@ const updateAvatar = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, getUser, createUser, updateUser, updateAvatar };
+module.exports = {
+  getUsers,
+  getUser,
+  createUser,
+  updateUser,
+  updateAvatar,
+};

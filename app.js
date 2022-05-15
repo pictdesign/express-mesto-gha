@@ -1,19 +1,20 @@
 const express = require('express');
-const PORT = process.env.PORT || 3000;
-const app = express();
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const userRouter = require('./router/users');
 const cardsRouter = require('./router/cards');
-const mongoose = require('mongoose');
-const bodyParser = require("body-parser");
-const { NotFoundError } = require("./errors/errors");
+const { NotFoundError } = require('./errors/NotFoundError');
 
-mongoose.connect("mongodb://localhost:27017/mesto", {
+const PORT = process.env.PORT || 3000;
+const app = express();
+
+mongoose.connect('mongodb://localhost:27017/mesto', {
   useNewUrlParser: true,
 });
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '624b147ad24f948d4159391c'
+    _id: '624b147ad24f948d4159391c',
   };
   next();
 });
@@ -21,7 +22,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use(userRouter);
 app.use(cardsRouter);
-app.use('*', (req, res) => {
+app.use('*', () => {
   throw new NotFoundError();
 });
 
@@ -31,7 +32,4 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => {
-  console.log('Server started');
-});
-
+app.listen(PORT);
