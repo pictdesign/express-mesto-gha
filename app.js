@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const userRouter = require('./router/users');
 const cardsRouter = require('./router/cards');
-const { NotFoundError } = require('./errors/NotFoundError');
+const NotFoundError = require('./errors/NotFoundError');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
