@@ -1,6 +1,10 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const DuplicateError = require('../errors/DuplicateError');
+const { generateToken, checkToken } = require('../helpers/jwt');
+const { isAuthorized } = require('../middlewares/auth');
 
 const getUsers = (_, res, next) => {
   User.find({})
@@ -26,17 +30,37 @@ const getUser = (req, res, next) => {
     });
 };
 
+const getMe = (req, res, next) => {
+  const auth = req.headers.authorization;
+  const token = auth.replace('Bearer ', '');
+  const payload = checkToken(token);
+  const id = payload.payload;
+  User.findById({ _id: id })
+    .then((user) => {
+      res.status(200).send(user);
+    })
+    .catch(err => next(err));
+};
+
 const createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError());
-      } else {
-        next(err);
-      }
-    });
+  const { name, about, avatar, email, password } = req.body;
+
+  if(!email || !password) {
+    throw new BadRequestError('Нужны логин и пароль');
+  }
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      return User.create({ name, about, avatar, email, password: hash })
+      .then((user) => res.status(201).send(user))
+      .catch((err) => {
+        if (err.code === 11000) {
+          next(new DuplicateError());
+        } else {
+          next(err);
+        }
+      });
+    })
+
 };
 
 const updateUser = async (req, res, next) => {
@@ -83,10 +107,28 @@ const updateAvatar = async (req, res, next) => {
   }
 };
 
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new BadRequestError('Нужны логин и пароль');
+  }
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = generateToken(user.id);
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      }).end();
+    })
+    .catch((err) => next(err));
+};
+
 module.exports = {
   getUsers,
   getUser,
+  getMe,
   createUser,
   updateUser,
   updateAvatar,
+  login,
 };
