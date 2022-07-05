@@ -4,7 +4,6 @@ const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const DuplicateError = require('../errors/DuplicateError');
 const { generateToken, checkToken } = require('../helpers/jwt');
-const { isAuthorized } = require('../middlewares/auth');
 
 const getUsers = (_, res, next) => {
   User.find({})
@@ -39,28 +38,30 @@ const getMe = (req, res, next) => {
     .then((user) => {
       res.status(200).send(user);
     })
-    .catch(err => next(err));
+    .catch((err) => next(err));
 };
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
-
-  if(!email || !password) {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  if (!email || !password) {
     throw new BadRequestError('Нужны логин и пароль');
   }
   bcrypt.hash(password, 10)
     .then((hash) => {
-      return User.create({ name, about, avatar, email, password: hash })
-      .then((user) => res.status(201).send(user))
-      .catch((err) => {
-        if (err.code === 11000) {
-          next(new DuplicateError());
-        } else {
-          next(err);
-        }
-      });
-    })
-
+      User.create({
+        name, about, avatar, email, password: hash,
+      })
+        .then((user) => res.status(201).send(user))
+        .catch((err) => {
+          if (err.code === 11000) {
+            next(new DuplicateError());
+          } else {
+            next(err);
+          }
+        });
+    });
 };
 
 const updateUser = async (req, res, next) => {

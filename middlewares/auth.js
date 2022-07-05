@@ -1,6 +1,6 @@
-const AuthorizationError = require("../errors/AuthorizationError");
-const { checkToken } = require("../helpers/jwt");
-const User = require("../models/user");
+const AuthorizationError = require('../errors/AuthorizationError');
+const { checkToken } = require('../helpers/jwt');
+const User = require('../models/user');
 
 const isAuthorized = (req, res, next) => {
   const auth = req.headers.authorization;
