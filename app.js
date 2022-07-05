@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const userRouter = require('./router/users');
 const cardsRouter = require('./router/cards');
@@ -26,10 +26,10 @@ app.post('/signin', celebrate({
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom(validateUrl, 'custom validation'),
+    avatar: Joi.string().custom(validateUrl, 'validate'),
   }),
 }), createUser);
 app.use(isAuthorized, userRouter);
@@ -38,6 +38,8 @@ app.use(isAuthorized, cardsRouter);
 app.use('*', () => {
   throw new NotFoundError();
 });
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = '500', message = 'На сервере ошибка' } = err;

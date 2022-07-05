@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const { validateUrl } = require('../utils/utils');
 const bcrypt = require('bcryptjs');
 const AuthorizationError = require('../errors/AuthorizationError');
 
@@ -20,6 +21,7 @@ const UserSchema = new Schema({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: { validator: validateUrl, message: 'Введите правильный URL' },
   },
   email: {
     type: String,

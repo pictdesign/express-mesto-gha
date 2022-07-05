@@ -3,7 +3,7 @@ const validateUrl = (url) => {
   if (regex.test(url)) {
     return url;
   }
-  throw new Error('Invalid url');
+  throw new Error('Неверный адрес');
 };
 
 module.exports = { validateUrl };
