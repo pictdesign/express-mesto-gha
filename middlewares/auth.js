@@ -3,7 +3,7 @@ const { checkToken } = require('../helpers/jwt');
 const User = require('../models/user');
 
 const isAuthorized = (req, res, next) => {
-  const auth = req.cookie;
+  const auth = req.cookies;
   if (!auth) {
     throw new AuthorizationError('Необходимо авторизоваться');
   }
