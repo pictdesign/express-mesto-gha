@@ -3,13 +3,12 @@ const { checkToken } = require('../helpers/jwt');
 const User = require('../models/user');
 
 const isAuthorized = (req, res, next) => {
-  const auth = req.headers.authorization;
+  const auth = req.cookie;
   if (!auth) {
     throw new AuthorizationError('Необходимо авторизоваться');
   }
-  const token = auth.replace('Bearer ', '');
   try {
-    const payload = checkToken(token);
+    const payload = checkToken(auth);
     User.findOne({ id: payload })
       .then((user) => {
         if (!user) {
