@@ -30,11 +30,7 @@ const getUser = (req, res, next) => {
 };
 
 const getMe = (req, res, next) => {
-  const auth = req.headers.authorization;
-  const token = auth.replace('Bearer ', '');
-  const payload = checkToken(token);
-  const id = payload.payload;
-  User.findById({ _id: id })
+  User.findOne({ id: req.user.id })
     .then((user) => {
       res.status(200).send(user);
     })
@@ -116,10 +112,12 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = generateToken(user.id);
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-      }).end();
+      res
+        .status(200)
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        }).end();
     })
     .catch((err) => next(err));
 };

@@ -3,17 +3,18 @@ const { checkToken } = require('../helpers/jwt');
 const User = require('../models/user');
 
 const isAuthorized = (req, res, next) => {
-  const auth = req.cookies;
-  if (!auth) {
+  const { jwt } = req.cookies;
+  if (!jwt) {
     throw new AuthorizationError('Необходимо авторизоваться');
   }
   try {
-    const payload = checkToken(auth);
+    const payload = checkToken(jwt);
     User.findOne({ id: payload })
       .then((user) => {
         if (!user) {
           throw new AuthorizationError('Необходимо авторизоваться');
         }
+        req.user = payload;
         next();
       });
   } catch (err) {

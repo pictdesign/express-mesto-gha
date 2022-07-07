@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const userRouter = require('./router/users');
@@ -11,6 +12,8 @@ const { validateUrl } = require('./utils/utils');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
+app.use(cookieParser());
 
 mongoose.connect('mongodb://localhost:27017/mesto', {
   useNewUrlParser: true,

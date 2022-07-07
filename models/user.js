@@ -1,7 +1,7 @@
+const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { validateUrl } = require('../utils/utils');
-const bcrypt = require('bcryptjs');
 const AuthorizationError = require('../errors/AuthorizationError');
 
 const { Schema } = mongoose;
