@@ -16,6 +16,9 @@ const isAuthorized = (req, res, next) => {
         }
         req.user = payload;
         next();
+      })
+      .catch((err) => {
+        next(err);
       });
   } catch (err) {
     throw new AuthorizationError('Необходимо авторизоваться');

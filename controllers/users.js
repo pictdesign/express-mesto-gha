@@ -30,7 +30,7 @@ const getUser = (req, res, next) => {
 };
 
 const getMe = (req, res, next) => {
-  User.findOne({ id: req.user.id })
+  User.findOne({ id: req.user.payload })
     .then((user) => {
       res.status(200).send(user);
     })
@@ -42,6 +42,10 @@ const createUser = async (req, res, next) => {
     email, password, name, about, avatar,
   } = req.body;
   try {
+    const foundUser = User.findOne({ email });
+    if (foundUser) {
+      throw new DuplicateError();
+    }
     if (!email || !password) {
       throw new BadRequestError();
     }
@@ -58,13 +62,10 @@ const createUser = async (req, res, next) => {
       },
     });
   } catch (err) {
-    if (err.code === 11000) {
-      next(new DuplicateError());
-    } else {
-      next(err);
-    }
+    next(err);
   }
 };
+
 
 const updateUser = async (req, res, next) => {
   const userId = req.user.id;

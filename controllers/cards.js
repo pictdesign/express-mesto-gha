@@ -11,7 +11,7 @@ const getCards = (_, res, next) => {
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
+  const owner = req.user.payload;
   Card.create({ name, link, owner })
     .then((card) => res.status(201).send({ card }))
     .catch((err) => {
@@ -46,7 +46,8 @@ const deleteCard = (req, res, next) => {
 };
 
 const likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+  const userId = req.user.payload;
+  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: userId } }, { new: true })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
@@ -64,7 +65,8 @@ const likeCard = (req, res, next) => {
 };
 
 const dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+  const userId = req.user.payload;
+  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: userId } }, { new: true })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
