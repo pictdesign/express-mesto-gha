@@ -24,12 +24,13 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
+  const userId = req.user.payload;
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
       } else {
-        if (card.owner._id.toString() !== req.user._id.toString()) {
+        if (card.owner._id.toString() !== userId.toString()) {
           throw new ForbiddenError();
         }
         return card.remove()
