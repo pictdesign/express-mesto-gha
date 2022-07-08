@@ -3,7 +3,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const DuplicateError = require('../errors/DuplicateError');
-const { generateToken, checkToken } = require('../helpers/jwt');
+const { generateToken } = require('../helpers/jwt');
 
 const getUsers = (_, res, next) => {
   User.find({})
@@ -37,27 +37,33 @@ const getMe = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-const createUser = (req, res, next) => {
+const createUser = async (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    email, password, name, about, avatar,
   } = req.body;
-  if (!email || !password) {
-    throw new BadRequestError('Нужны логин и пароль');
-  }
-  bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        name, about, avatar, email, password: hash,
-      })
-        .then((user) => res.status(201).send(user))
-        .catch((err) => {
-          if (err.code === 11000) {
-            next(new DuplicateError());
-          } else {
-            next(err);
-          }
-        });
+  try {
+    if (!email || !password) {
+      throw new BadRequestError();
+    }
+    const hashPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      email, password: hashPassword, name, about, avatar,
     });
+    res.status(200).send({
+      user: {
+        email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      },
+    });
+  } catch (err) {
+    if (err.code === 11000) {
+      next(new DuplicateError());
+    } else {
+      next(err);
+    }
+  }
 };
 
 const updateUser = async (req, res, next) => {
@@ -122,6 +128,17 @@ const login = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+const logout = (req, res, next) => {
+  try {
+    res
+      .status(200)
+      .clearCookie('jwt')
+      .send({ message: 'Возвращайтесь как можно скорее' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getUsers,
   getUser,
@@ -130,4 +147,5 @@ module.exports = {
   updateUser,
   updateAvatar,
   login,
+  logout,
 };
