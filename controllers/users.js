@@ -67,10 +67,10 @@ const createUser = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
   const { name, about } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(
+    const user = await User.findOneAndUpdate(
       userId,
       { name, about },
       { new: true, runValidators: true },
