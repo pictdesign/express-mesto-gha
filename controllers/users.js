@@ -42,7 +42,7 @@ const createUser = async (req, res, next) => {
     email, password, name, about, avatar,
   } = req.body;
   try {
-    const foundUser = User.findOne({ email });
+    const foundUser = await User.findOne({ email });
     if (foundUser) {
       throw new DuplicateError();
     }
@@ -50,15 +50,15 @@ const createUser = async (req, res, next) => {
       throw new BadRequestError();
     }
     const hashPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({
+    const createdUser = await User.create({
       email, password: hashPassword, name, about, avatar,
     });
     res.status(200).send({
       user: {
-        email: user.email,
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
+        email: createdUser.email,
+        name: createdUser.name,
+        about: createdUser.about,
+        avatar: createdUser.avatar,
       },
     });
   } catch (err) {
